@@ -1,12 +1,16 @@
-﻿namespace Stadion
+﻿using Stadion;
+using System;
+using System.Collections.Generic;
+using System.IO;
+namespace Stadion
 {
-    /// Репозиторий для чтения данных из CSV-файлов.
     public class CsvRepository
     {
         private string _basePath;
-
         public CsvRepository(string basePath)
         {
+            if (string.IsNullOrWhiteSpace(basePath))
+                throw new ArgumentException("Путь к папке с данными не может быть пустым.");
             _basePath = basePath;
         }
         public List<Coach> GetCoaches()
@@ -20,12 +24,15 @@
             {
                 string[] parts = lines[i].Split(',');
                 if (parts.Length < 2) continue;
-                Coach c = new Coach
+                try
                 {
-                    Id = int.Parse(parts[0]),
-                    FullName = parts[1]
-                };
-                result.Add(c);
+                    Coach c = new Coach(int.Parse(parts[0]), parts[1]);
+                    result.Add(c);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
             }
             return result;
         }
@@ -40,15 +47,21 @@
             {
                 string[] parts = lines[i].Split(',');
                 if (parts.Length < 5) continue;
-                Team t = new Team
+                try
                 {
-                    Id = int.Parse(parts[0]),
-                    Name = parts[1],
-                    CoachId = int.Parse(parts[2]),
-                    City = parts[3],
-                    Budget = decimal.Parse(parts[4])
-                };
-                result.Add(t);
+                    Team t = new Team(
+                        int.Parse(parts[0]),
+                        parts[1],
+                        int.Parse(parts[2]),
+                        parts[3],
+                        decimal.Parse(parts[4])
+                    );
+                    result.Add(t);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
             }
             return result;
         }
@@ -63,16 +76,22 @@
             {
                 string[] parts = lines[i].Split(',');
                 if (parts.Length < 6) continue;
-                Match m = new Match
+                try
                 {
-                    Id = int.Parse(parts[0]),
-                    TeamId = int.Parse(parts[1]),
-                    Opponent = parts[2],
-                    Date = DateTime.ParseExact(parts[3], "dd.MM.yyyy", null),
-                    Score = parts[4],
-                    Stadium = parts[5]
-                };
-                result.Add(m);
+                    Match m = new Match(
+                        int.Parse(parts[0]),
+                        int.Parse(parts[1]),
+                        parts[2],
+                        DateTime.ParseExact(parts[3], "dd.MM.yyyy", null),
+                        parts[4],
+                        parts[5]
+                    );
+                    result.Add(m);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
             }
             return result;
         }
